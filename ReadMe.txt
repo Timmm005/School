@@ -1,1 +1,3 @@
-Asks user for their name, surname and favorite film, saves to info.txt
+Asks user for their name, surname and a book recommendation, saves to info.txt
+
+Subscribe to Technoblade
