@@ -1,0 +1,1 @@
+Asks user for their name, surname and favorite film, saves to info.txt
