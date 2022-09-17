@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 
@@ -33,6 +34,24 @@ void readInfo()
 
 int main()
 {
-    readInfo();
-    //printInfo();
+    cout << "Select an option (int):\n";
+    cout << "1) Read user's info\n";
+    cout << "2) Print the saved info\n";
+    int option;
+    cin >> option;
+
+    switch (option)
+    {
+    case 1:
+        readInfo();
+        break;
+
+    case 2:
+        printInfo();
+        break;
+
+    default:
+        cout << "Not a valid option";
+        break;
+    }
 }
