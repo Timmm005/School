@@ -5,38 +5,84 @@
 using namespace std;
 
 
-void printInfo()
+void printInfo(int width)
 {
+    if (width < 37)
+    {
+        cout << "width was increased to fit minimal information\n";
+        width = 37;
+    }
+
     ifstream f("info.txt");
     string line, word, popBook;
+    string emp = "               ";
     int n = 0;
     map<string, int> bookPopularity = {};
 
-    cout << "Name | Surname | Info\n";
+    cout << "Name    |    Surname    |    Info    \n";
+    cout << "-------------------------------------\n";
     while (getline(f, line))
     {
         stringstream stream(line);
         int counter = 0;
         n++;
+        int remWidth = width - 25; //this is first used in the INFO part (25 comes from name+surname)
 
         while (getline(stream, word, ','))
         {
-            if (counter <= 1)//name | surname |
+            if (counter == 0)//name   |
             {
-                cout << word << " |";
+                if (word.length() > 8) { cout << word.substr(0, 7) << ".|"; }
+                else { cout << word << emp.substr(0, 8 - word.length()) << "|"; }
                 counter++;
             }
 
+
+            else if (counter == 1)//   surname   |
+            {
+                if (word.length() > 15) { cout << word.substr(0, 14) << ".|"; }
+                else { cout << word << emp.substr(0, 15 - word.length()) << "|"; }
+                counter++;
+            }
+
+
             else if (counter == 2) //first question is abt the book
             {
-                cout << word;
+                if (remWidth == 0) {}
+                else if (remWidth <= 3) { cout << "..."; }
+                else if (word.length() > remWidth)
+                {
+                    cout << word.substr(0, remWidth - 3) << "...";
+                    remWidth = 0;
+                }
+                else
+                {
+                    cout << word;
+                    remWidth -= word.length();
+                }
+
                 counter++;
                 string book = word.substr(1);
                 bookPopularity[book]++;
                 if (bookPopularity[book] >= bookPopularity[popBook]) { popBook = book; }
             }
 
-            else { cout << "," << word; }
+
+            else
+            {
+                if (remWidth == 0) {}
+                else if (remWidth <= 3) { cout << "..."; }
+                else if (word.length() > remWidth)
+                {
+                    cout << "," << word.substr(0, remWidth - 3) << "...";
+                    remWidth = 0;
+                }
+                else
+                {
+                    cout << "," << word;
+                    remWidth -= word.length();
+                }
+            }
         }
         cout << "\n";
 
@@ -93,7 +139,7 @@ int main()
         break;
 
     case 2:
-        printInfo();
+        printInfo(66);
         break;
 
     default:
