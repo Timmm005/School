@@ -7,11 +7,28 @@ using namespace std;
 void printInfo()
 {
     ifstream f("info.txt");
-    string line;
+    string line, word;
+
+    cout << "Name | Surname | Info\n";
 
     while (getline(f, line))
     {
-        cout << line << "\n";
+        stringstream stream(line);
+        int counter = 0;
+
+        while (getline(stream, word, ','))
+        {
+            if (counter <= 1)
+            {
+                cout << word << " |";
+                counter++;
+            }
+            else if (counter == 2) { cout << word; counter++; }
+            else { cout << "," << word; }
+        }
+        cout << "\n";
+
+
     }
     f.close();
 }
