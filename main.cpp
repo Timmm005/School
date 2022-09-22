@@ -99,19 +99,24 @@ void readInfo()
 {
     fstream q("questions.txt"), f;
     f.open("info.txt", ios_base::app);
-    string questionLine, name, surname, answer, _;
+    string questionLine, name, surname, answer, _, question, qKeyword;
 
     cout << "Input your name and surname:\n";
     cin >> name >> surname;
     f << name << ", " << surname;
     getline(cin, _);
 
+
     cout << "Please answer the following questions:\n";
     while (getline(q, questionLine))
     {
-        cout << questionLine << "\n";
+        auto index = questionLine.find(";");
+        question = questionLine.substr(0, index);
+        qKeyword = questionLine.substr(index + 2); //extra ; and a space
+
+        cout << question << "\n";
         getline(cin, answer);
-        f << ", " << answer;
+        f << ", " << qKeyword << "=" << answer;
     }
 
     f << ";\n";
