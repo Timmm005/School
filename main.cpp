@@ -2,8 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-
+#include <vector>
 using namespace std;
+
 
 void updateQuestions() {
     int quesCnt;
@@ -23,92 +24,124 @@ void updateQuestions() {
     }
 }
 
-void printInfo(int width)
+
+
+string getColumnString(string str, int columnWidth)
 {
-    if (width < 37)
+    if (str.length() > columnWidth)
     {
-        cout << "width was increased to fit minimal information\n";
-        width = 37;
+        string newStr = str.substr(0, columnWidth - 3);
+        newStr.append("...");
+        return newStr;
     }
 
-    ifstream f("info.txt");
-    string line, word, popBook;
-    string emp = "               ";
+    else
+    {
+        string newStr = str;
+        while (newStr.length() < columnWidth) { newStr.append(" "); }
+        return newStr;
+    }
+}
+
+
+void printInfo()
+{
+    ifstream f("info.txt"), q("questions.txt");
+    string line, word, popBook, qLine;
+    vector<string> qKeywords;
     int n = 0;
+    int nQ = 0;
     map<string, int> bookPopularity = {};
 
-    cout << "Name    |    Surname    |    Info    \n";
-    cout << "-------------------------------------\n";
+    while (getline(q, qLine))
+    {
+        string keyword = qLine.substr(qLine.find(";") + 1);
+        qKeywords.push_back(keyword);
+        nQ++;
+    }
+
+
+    cout << "Input the width of the table\n";
+    int width, columnWidth;
+    int const minColumnWidth = 5;
+    cin >> width;
+    width--;
+    columnWidth = width / (nQ + 2) - 1;
+
+    while (columnWidth < minColumnWidth)
+    {
+        cout << "Input the width of the table (>= " << (minColumnWidth + 1) * (nQ + 2) + 1 << ")\n";
+        cin >> width;
+        width--;
+        columnWidth = width / (nQ + 2) - 1;
+    }
+
+    cout << "|" << getColumnString(" name", columnWidth) << "|" << getColumnString(" surname", columnWidth) << "|";
+
+    int bookKwNumber = -1;
+    int counter = 0;
+    for (string kw : qKeywords)
+    {
+        cout << getColumnString(kw, columnWidth) << "|";
+        if (kw == " book") { bookKwNumber = counter; }
+        counter++;
+    }
+    cout << "\n";
+
+    counter = 0;
+    while (counter <= (columnWidth + 1) * (nQ + 2)) { cout << "-"; counter++; }
+    cout << "\n";
+
     while (getline(f, line))
     {
         stringstream stream(line);
         int counter = 0;
         n++;
-        int remWidth = width - 25; //this is first used in the INFO part (25 comes from name+surname)
 
         while (getline(stream, word, ','))
         {
-            if (counter == 0)//name   |
+            if (counter == 0)//name
             {
-                if (word.length() > 8) { cout << word.substr(0, 7) << ".|"; }
-                else { cout << word << emp.substr(0, 8 - word.length()) << "|"; }
-                counter++;
+                cout << "| " << getColumnString(word, columnWidth - 1) << "|";
             }
 
-
-            else if (counter == 1)//   surname   |
+            else if (counter == 1)//surname
             {
-                if (word.length() > 15) { cout << word.substr(0, 14) << ".|"; }
-                else { cout << word << emp.substr(0, 15 - word.length()) << "|"; }
-                counter++;
+                cout << getColumnString(word, columnWidth) << "|";
             }
 
+            else { cout << getColumnString(word, columnWidth) << "|"; } // Info
 
-            else if (counter == 2) //first question is abt the book
+
+            if ((counter - 2) == bookKwNumber)
             {
-                if (remWidth == 0) {}
-                else if (remWidth <= 3) { cout << "..."; }
-                else if (word.length() > remWidth)
-                {
-                    cout << word.substr(0, remWidth - 3) << "...";
-                    remWidth = 0;
-                }
-                else
-                {
-                    cout << word;
-                    remWidth -= word.length();
-                }
-
-                counter++;
                 string book = word.substr(1);
                 bookPopularity[book]++;
                 if (bookPopularity[book] >= bookPopularity[popBook]) { popBook = book; }
             }
 
+            counter++;
 
-            else
-            {
-                if (remWidth == 0) {}
-                else if (remWidth <= 3) { cout << "..."; }
-                else if (word.length() > remWidth)
-                {
-                    cout << "," << word.substr(0, remWidth - 3) << "...";
-                    remWidth = 0;
-                }
-                else
-                {
-                    cout << "," << word;
-                    remWidth -= word.length();
-                }
-            }
+
         }
         cout << "\n";
 
     }
     f.close();
+    q.close();
     cout << "\n";
+
     cout << "Total number of people: " << n << "\n";
-    cout << "The most popular book is " << "'" << popBook << "'" << " with " << bookPopularity[popBook] << " likes";
+    if (bookKwNumber != -1)
+    {
+        cout << "The most popular book is " << "'" << popBook << "'" << " with " << bookPopularity[popBook] << " likes";
+    }
+
+    else
+    {
+        cout << "Could not find the best book because that question is missing\n";
+    }
+    cout << "\n";
 }
 
 
@@ -117,27 +150,30 @@ void readInfo()
 {
     fstream q("questions.txt"), f;
     f.open("info.txt", ios_base::app);
-    string questionLine, name, surname, answer, _, question, qKeyword;
+    string questionLine, name, surname, answer, _;
 
     cout << "Input your name and surname:\n";
     cin >> name >> surname;
+    while (name.find(",") != string::npos) { cout << "Symbol ',' is unavailable, enter your NAME again:\n"; cin >> name; }
+    while (surname.find(",") != string::npos) { cout << "Symbol ',' is unavailable, enter your SURNAME again:\n"; cin >> surname; }
+
     f << name << ", " << surname;
     getline(cin, _);
-
 
     cout << "Please answer the following questions:\n";
     while (getline(q, questionLine))
     {
-        auto index = questionLine.find(";");
-        question = questionLine.substr(0, index);
-        qKeyword = questionLine.substr(index + 2); //extra ; and a space
-
-        cout << question << "\n";
+        cout << questionLine.substr(0, questionLine.find(";")) << "\n";
         getline(cin, answer);
-        f << ", " << qKeyword << "=" << answer;
+        while (answer.find(",") != string::npos)
+        {
+            cout << "Symbol ',' is unavailable, answer again\n";
+            getline(cin, answer);
+        }
+        f << ", " << answer;
     }
 
-    f << ";\n";
+    f << "\n";
 
 
     q.close();
@@ -163,7 +199,7 @@ int main()
         break;
 
     case 2:
-        printInfo(66);
+        printInfo();
         break;
 
     case 3:
@@ -175,5 +211,6 @@ int main()
         break;
     }
 }
+
 
 
