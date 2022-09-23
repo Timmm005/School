@@ -35,6 +35,7 @@ void updateQuestions() {
     ofstream info;
     info.open("info.txt", ofstream::out | ofstream::trunc);
     info.close();
+    qOut.close();
 
     cout << "\n";
     cout << "Questions were changed\n";
