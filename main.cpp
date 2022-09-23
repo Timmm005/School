@@ -2,8 +2,26 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+
 using namespace std;
 
+void updateQuestions() {
+    int quesCnt;
+    cout << "Enter questions count\n";
+    cin >> quesCnt;
+
+    cout << "Enter questions in format:\n";
+    cout << "[question]; [answer type]\n";
+    cout << "Example: What's your name?; name\n";
+
+    fstream qOut("questions.txt");
+    string ques;
+    getline(cin, ques);
+    while (quesCnt--) {
+        getline(cin, ques);
+        qOut << ques << "\n";
+    }
+}
 
 void printInfo(int width)
 {
@@ -134,6 +152,7 @@ int main()
     cout << "Select an option (int):\n";
     cout << "1) Read user's info\n";
     cout << "2) Print the saved info\n";
+    cout << "3) Rewrite questions\n";
     int option;
     cin >> option;
 
@@ -145,6 +164,10 @@ int main()
 
     case 2:
         printInfo(66);
+        break;
+
+    case 3:
+        updateQuestions();
         break;
 
     default:
