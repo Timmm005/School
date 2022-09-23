@@ -10,18 +10,35 @@ void updateQuestions() {
     int quesCnt;
     cout << "Enter questions count\n";
     cin >> quesCnt;
+    if (quesCnt < 0) { quesCnt = 0; }
 
     cout << "Enter questions in format:\n";
     cout << "[question]; [answer type]\n";
     cout << "Example: What's your name?; name\n";
+    cout << "\n";
 
-    fstream qOut("questions.txt");
+    ofstream qOut;
+    qOut.open("questions.txt", ofstream::out | ofstream::trunc);
     string ques;
     getline(cin, ques);
     while (quesCnt--) {
+        cout << "Enter new question:\n";
         getline(cin, ques);
+        while (ques.find("; ") == string::npos)
+        {
+            cout << "Your question does not fit the format, input it correctly:\n";
+            getline(cin, ques);
+        }
         qOut << ques << "\n";
     }
+
+    ofstream info;
+    info.open("info.txt", ofstream::out | ofstream::trunc);
+    info.close();
+
+    cout << "\n";
+    cout << "Questions were changed\n";
+    cout << "info.txt was cleared\n";
 }
 
 

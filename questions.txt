@@ -1,3 +1,4 @@
 Input a book that you would like to recommend; book
 Input your favorite film; film
 what is E; e
+favorite pokemon?; pokemon
